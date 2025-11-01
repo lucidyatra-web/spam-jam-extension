@@ -1,0 +1,65 @@
+#fillit-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(10,10,10,0.55);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 280ms cubic-bezier(.2,.9,.2,1);
+  z-index: 2147483647;
+}
+
+#fillit-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#fillit-popup {
+  background: #fff;
+  padding: 28px 32px;
+  border-radius: 18px;
+  max-width: 340px;
+  width: 90%;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+  font-family: "Inter", system-ui, sans-serif;
+  text-align: center;
+  transform: translateY(12px);
+  transition: transform 280ms cubic-bezier(.2,.9,.2,1);
+}
+
+#fillit-overlay.show #fillit-popup {
+  transform: translateY(0);
+}
+
+#fillit-popup h2 {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 14px;
+  color: #0A0A0A;
+}
+
+#fillit-popup p {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 18px;
+  line-height: 1.4;
+}
+
+#fillit-popup button {
+  background: #0A0A0A;
+  color: #fff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 180ms cubic-bezier(.2,.9,.2,1), transform 180ms cubic-bezier(.2,.9,.2,1);
+}
+
+#fillit-popup button:hover {
+  background: #1A1A1A;
+  transform: translateY(-1px);
+}
