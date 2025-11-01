@@ -9,6 +9,7 @@ window.analyzeSite = async function analyzeSite() {
       chatAnalysis: true,
       trustedSites: [],
     });
+    console.log(settings)
 
     const trustedSites = settings.trustedSites || [];
     const currentDomain = location.hostname.replace("www.", "");

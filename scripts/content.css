@@ -63,3 +63,156 @@
   background: #1A1A1A;
   transform: translateY(-1px);
 }
+
+/* Block mode specific styling */
+#fillit-popup.block-mode {
+  background: #fff;
+  border: 2px solid #dc2626;
+}
+
+#fillit-popup.block-mode h2 {
+  color: #dc2626;
+  font-size: 18px;
+}
+
+#fillit-popup.block-mode button {
+  background: #dc2626;
+}
+
+#fillit-popup.block-mode button:hover {
+  background: #b91c1c;
+}
+
+/* Luxurious Analyzing Animation */
+#spamjam-analyzer {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  padding: 16px 20px;
+  font-family: "Inter", system-ui, sans-serif;
+  color: #fff;
+  opacity: 0;
+  transform: translateY(-20px) scale(0.9);
+  transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 2147483646;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+#spamjam-analyzer.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+#spamjam-analyzer.complete {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  transform: scale(1.05);
+}
+
+.analyzer-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 200px;
+}
+
+.analyzer-icon {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shield-icon {
+  font-size: 18px;
+  z-index: 2;
+  position: relative;
+}
+
+.scan-ring {
+  position: absolute;
+  inset: -4px;
+  border: 2px solid transparent;
+  border-top: 2px solid #3b82f6;
+  border-radius: 50%;
+  animation: luxurySpin 2s linear infinite;
+}
+
+.scan-pulse {
+  position: absolute;
+  inset: -8px;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 50%;
+  animation: luxuryPulse 2s ease-in-out infinite;
+}
+
+.analyzer-text {
+  flex: 1;
+}
+
+.main-text {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 2px;
+  color: #fff;
+}
+
+.sub-text {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+.progress-dots {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.dot {
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  animation: luxuryDots 1.5s ease-in-out infinite;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes luxurySpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes luxuryPulse {
+  0%, 100% { 
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% { 
+    transform: scale(1.1);
+    opacity: 0.6;
+  }
+}
+
+@keyframes luxuryDots {
+  0%, 80%, 100% {
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(1);
+  }
+  40% {
+    background: #3b82f6;
+    transform: scale(1.2);
+  }
+}

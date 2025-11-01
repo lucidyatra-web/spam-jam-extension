@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -33,7 +34,8 @@
     <main class="content" id="main-view">
       <div class="center-view">
         <div class="input-row">
-          <input id="trusted-site-input" type="url" class="lux-input" placeholder="Add trusted site (e.g. example.com)" />
+          <input id="trusted-site-input" type="url" class="lux-input"
+            placeholder="Add trusted site (e.g. example.com)" />
           <button id="add-btn" class="primary-btn">Add</button>
         </div>
 
@@ -56,7 +58,7 @@
       <div class="settings-panel">
         <h3>Settings</h3>
         <div class="setting-item">
-          <span>Warning / Block Mode</span>
+          <span>Block Mode</span>
           <label class="switch">
             <input type="checkbox" id="toggle-warning">
             <span class="slider"></span>
@@ -64,24 +66,33 @@
         </div>
 
         <div class="setting-item">
-          <span>Chat Analysis</span>
+          <span>OFF/ON</span>
           <label class="switch">
             <input type="checkbox" id="toggle-chat">
             <span class="slider"></span>
           </label>
         </div>
 
-        <button class="primary-btn" id="back-btn">← Back</button>
+        <div class="setting-item">
+          <span>Chat Analysis</span>
+          <label class="switch">
+            <input type="checkbox" id="toggle-smart-filters">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <button class="primary-btn" id="back-btn">Back</button>
       </div>
     </main>
 
     <!-- FOOTER -->
     <footer class="footer">
       <span class="footer-left">Saved locally</span>
-      <span class="footer-right">v1.0</span>
+      <span class="footer-right" id="ai-status">v1.0</span>
     </footer>
   </div>
 
   <script type="module" src="popup.js"></script>
 </body>
+
 </html>

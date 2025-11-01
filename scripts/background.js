@@ -1,12 +1,13 @@
-const GEMINI_API_KEY = "AIzaSyCOxHLUVqrKVJQWHz-5QmisrtE6bakXWOE";// safe here
+// Background script - handles cloud API fallback
+const GEMINI_API_KEY = "AIzaSyCOxHLUVqrKVJQWHz-5QmisrtE6bakXWOE";
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === "askGemini") {
-    ("[Background] Gemini request received.");
+    console.log("[Background] Cloud API request received.");
 
     (async () => {
       try {
-        const res = await fetch(
+        const response = await fetch(
           "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
           {
             method: "POST",
@@ -20,24 +21,34 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           }
         );
 
-        const data = await res.json();
-        ("[Background] Gemini raw:", data);
+        if (!response.ok) {
+          throw new Error(`API request failed: ${response.status}`);
+        }
 
-        const text =
-          data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ||
-          "[No response]";
+        const data = await response.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+        
+        if (!text) {
+          throw new Error("No response from API");
+        }
 
-        ("[Background] Gemini responded successfully.");
-        sendResponse({ success: true, text });
+        console.log("[Background] Cloud API responded successfully");
+        sendResponse({ 
+          success: true, 
+          text: text,
+          source: 'cloud' 
+        });
       } catch (err) {
-        console.error("[Background] Gemini call failed:", err);
-        sendResponse({ success: false, error: err.message });
+        console.error("[Background] Cloud API failed:", err);
+        sendResponse({ 
+          success: false, 
+          error: err.message 
+        });
       }
     })();
 
-    // 👇 This is CRUCIAL — tells Chrome to keep channel alive for async sendResponse
+    // Keep channel alive for async sendResponse
     return true;
   }
-  
 });
 

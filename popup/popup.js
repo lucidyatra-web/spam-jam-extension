@@ -3,9 +3,6 @@
    Polished, animated, modern
 ================================*/
 
-const KEY = "spamjam-trusted-sites-v1";
-const PREFS_KEY = "spamjam-settings-v1";
-
 /* ---------- ELEMENTS ---------- */
 const addBtn = document.getElementById("add-btn");
 const input = document.getElementById("trusted-site-input");
@@ -21,14 +18,19 @@ const headerSub = document.getElementById("header-sub");
 
 const toggleWarning = document.getElementById("toggle-warning");
 const toggleChat = document.getElementById("toggle-chat");
+const toggleSmartFilters = document.getElementById("toggle-smart-filters");
 
 /* ---------- STATE ---------- */
-let trustedSites = loadSites();
-let prefs = loadPrefs();
+let trustedSites = [];
+let prefs = {};
 
 /* ---------- INIT ---------- */
-renderTrustedSites();
-applyPrefsUI();
+(async () => {
+  await loadData();
+  renderTrustedSites();
+  applyPrefsUI();
+  checkAIStatus();
+})();
 
 /* ---------- EVENTS ---------- */
 addBtn.addEventListener("click", onAdd);
@@ -39,11 +41,12 @@ backBtn.addEventListener("click", () => switchView(settingsView, mainView, "Trus
 
 toggleWarning.addEventListener("change", savePrefs);
 toggleChat.addEventListener("change", savePrefs);
+toggleSmartFilters.addEventListener("change", handleSmartFilters);
 
 /* ---------- FUNCTIONS ---------- */
 
 // Add new trusted site
-function onAdd() {
+async function onAdd() {
   const raw = input.value.trim();
   if (!raw) return flashInput("Enter a site");
   const domain = normalizeDomain(raw);
@@ -52,7 +55,7 @@ function onAdd() {
 
   // Add to top
   trustedSites.unshift(domain);
-  saveSites();
+  await saveSites();
   renderTrustedSites();
   input.value = "";
   showSavedToast();
@@ -92,9 +95,9 @@ function renderTrustedSites() {
     const delBtn = document.createElement("button");
     delBtn.className = "remove-btn";
     delBtn.textContent = "✕";
-    delBtn.onclick = () => {
+    delBtn.onclick = async () => {
       trustedSites.splice(idx, 1);
-      saveSites();
+      await saveSites();
       renderTrustedSites();
     };
 
@@ -138,36 +141,49 @@ function showSavedToast() {
   }, 900);
 }
 
-// LocalStorage helpers
-function saveSites() {
-  localStorage.setItem(KEY, JSON.stringify(trustedSites));
+/* ---------- STORAGE HELPERS ---------- */
+async function loadData() {
+  const data = await chrome.storage.local.get({
+    trustedSites: [],
+    mode: "warning", // "warning" or "block"
+    chatAnalysis: true
+  });
+
+  trustedSites = data.trustedSites || [];
+  prefs = {
+    mode: data.mode || "warning",
+    chatAnalysis: data.chatAnalysis !== false
+  };
 }
-function loadSites() {
-  try {
-    return JSON.parse(localStorage.getItem(KEY) || "[]");
-  } catch {
-    return [];
-  }
+
+async function saveSites() {
+  await chrome.storage.local.set({ trustedSites });
 }
 
 /* ---------- SETTINGS ---------- */
-function savePrefs() {
-  prefs.warningMode = toggleWarning.checked;
+async function savePrefs() {
+  prefs.mode = toggleWarning.checked ? "block" : "warning";
   prefs.chatAnalysis = toggleChat.checked;
-  localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
-}
 
-function loadPrefs() {
-  try {
-    return JSON.parse(localStorage.getItem(PREFS_KEY)) || { warningMode: true, chatAnalysis: false };
-  } catch {
-    return { warningMode: true, chatAnalysis: false };
-  }
+  await chrome.storage.local.set({
+    mode: prefs.mode,
+    chatAnalysis: prefs.chatAnalysis
+  });
 }
 
 function applyPrefsUI() {
-  toggleWarning.checked = prefs.warningMode;
+  toggleWarning.checked = prefs.mode === "block";
   toggleChat.checked = prefs.chatAnalysis;
+  toggleSmartFilters.checked = false; // Always off
+}
+
+/* ---------- SMART FILTERS HANDLER ---------- */
+function handleSmartFilters() {
+  if (toggleSmartFilters.checked) {
+    // Show coming soon message and turn it back off
+    alert("🚀 Smart Filters - Coming Soon!\n\nThis feature is under development and will be available in the next update.");
+    toggleSmartFilters.checked = false;
+  }
 }
 
 /* ---------- VIEW TRANSITIONS ---------- */
@@ -193,4 +209,29 @@ function switchView(from, to, headerText) {
     to.classList.remove("entering");
     from.classList.remove("active");
   }, 350);
+}
+
+/* ---------- AI STATUS CHECK ---------- */
+async function checkAIStatus() {
+  try {
+    // Get the active tab and check AI status
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    
+    if (tab) {
+      const response = await chrome.tabs.sendMessage(tab.id, { action: "getAIStatus" });
+      const statusEl = document.getElementById("ai-status");
+      
+      if (response && response.isBuiltInAvailable) {
+        statusEl.textContent = "v1.0 • Built-in AI";
+        statusEl.title = "Using Chrome's built-in AI (Gemini Nano)";
+      } else {
+        statusEl.textContent = "v1.0 • Cloud AI";
+        statusEl.title = "Using cloud-based AI (Gemini API)";
+      }
+    }
+  } catch (error) {
+    console.log("[Popup] Could not check AI status:", error);
+    // Default to showing version only
+    document.getElementById("ai-status").textContent = "v1.0";
+  }
 }
